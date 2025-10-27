@@ -20,6 +20,10 @@ tripbuilder/.env
 .env.test
 .env.staging
 
+# Allow .env.example files (templates with no real secrets)
+!.env.example
+!**/.env.example
+
 # Secret files
 secrets.json
 secrets.*.json
