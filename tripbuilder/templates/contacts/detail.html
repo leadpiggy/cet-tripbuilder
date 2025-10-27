@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}{{ contact.firstname }} {{ contact.lastname }} - TripBuilder{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('contact_list') }}">Contacts</a></li>
+                <li class="breadcrumb-item active">{{ contact.firstname }} {{ contact.lastname }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col">
+        <h1><i class="bi bi-person"></i> {{ contact.firstname }} {{ contact.lastname }}</h1>
+        <p class="text-muted">Contact details and trip enrollments</p>
+    </div>
+    <div class="col text-end">
+        {% if contact.id %}
+        <a href="https://app.gohighlevel.com/location/{{ ghl_location_id }}/contacts/detail/{{ contact.id }}" target="_blank" class="btn btn-primary">
+            <i class="bi bi-box-arrow-up-right"></i> View in GHL
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-person-vcard"></i> Contact Information</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-borderless">
+            <tr>
+                <th width="30%"><i class="bi bi-envelope"></i> Email:</th>
+                <td>{{ contact.email }}</td>
+            </tr>
+            <tr>
+                <th><i class="bi bi-telephone"></i> Phone:</th>
+                <td>{{ contact.phone or 'Not provided' }}</td>
+            </tr>
+            <tr>
+                <th><i class="bi bi-geo-alt"></i> City:</th>
+                <td>{{ contact.city or 'Not provided' }}</td>
+            </tr>
+            {% if contact.state %}
+            <tr>
+                <th><i class="bi bi-map"></i> State:</th>
+                <td>{{ contact.state }}</td>
+            </tr>
+            {% endif %}
+            {% if contact.country %}
+            <tr>
+                <th><i class="bi bi-globe"></i> Country:</th>
+                <td>{{ contact.country }}</td>
+            </tr>
+            {% endif %}
+            {% if contact.id %}
+            <tr>
+                <th><i class="bi bi-link-45deg"></i> GHL Contact ID:</th>
+                <td><code>{{ contact.id }}</code></td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="bi bi-airplane"></i> Enrolled Trips</h5>
+    </div>
+    <div class="card-body">
+        {% if contact.passengers %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Trip</th>
+                        <th>Start Date</th>
+                        <th>Stage</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for passenger in contact.passengers %}
+                    <tr>
+                        <td><strong>{{ passenger.trip.destination }}</strong></td>
+                        <td>{{ passenger.trip.start_date.strftime('%B %d, %Y') if passenger.trip.start_date else 'Not set' }}</td>
+                        <td>
+                            {% if passenger.stage %}
+                            <span class="badge bg-info">{{ passenger.stage.name }}</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Not Synced</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('trip_detail', trip_id=passenger.trip.id) }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-airplane"></i> View Trip
+                            </a>
+                            <a href="{{ url_for('passenger_detail', passenger_id=passenger.id) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-person-badge"></i> View Passenger
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info mb-0">
+            <i class="bi bi-info-circle"></i> Not enrolled in any trips yet.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

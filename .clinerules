@@ -1,0 +1,186 @@
+# Roo Code Project Configuration for TripBuilder
+
+# ==============================================================================
+# MANDATORY RULES - LOADED FROM .roo/rules/
+# ==============================================================================
+
+# Rules from .roo/rules/START-HERE.md
+# Rules from .roo/rules/terminal-and-mode-efficiency.md
+# Rules from .roo/rules/project-rules.md
+# Rules from .roo/rules/README.md
+# Rules from .roo/rules/RULES-INDEX.md
+
+# 🚨 CRITICAL PRE-FLIGHT CHECKLIST 🚨
+# BEFORE executing ANY command or switching modes, read:
+# .roo/rules/START-HERE.md - Contains MANDATORY checklists
+
+# ==============================================================================
+# PROJECT TRACKING & STATE
+# ==============================================================================
+
+# All work should be tracked in these living documents:
+# - memory-bank/progress.md (work done, next steps, decisions)
+# - memory-bank/techContext.md (stack, standards)
+# - memory-bank/systemPatterns.md (code patterns, best practices)
+# - memory-bank/activeContext.md (current focus)
+
+# These files MUST be updated after EVERY significant change.
+
+# ==============================================================================
+# TRIPBUILDER-SPECIFIC RULES
+# ==============================================================================
+
+## 1. Application Code Location
+# ALL application code lives in tripbuilder/ subdirectory
+# Run all Flask/Python commands from tripbuilder/ directory
+
+## 2. Bidirectional GHL Sync (MANDATORY)
+# - Creating a trip → Auto-create TripBooking opportunity in GHL
+# - Updating a trip → Auto-sync changes to GHL custom fields
+# - Enrolling a passenger → Auto-create Passenger opportunity in GHL
+# - Updating passenger → Auto-sync to GHL custom fields
+# Use TwoWaySyncService for all sync operations
+
+## 3. Field Mapping (NEVER HARDCODE)
+# - All field mappings in field_mapping.py
+# - Use parse_ghl_custom_fields() and map_*_custom_fields()
+# - NEVER hardcode field keys like 'opportunity.tripname'
+
+## 4. Database Schema Compatibility
+# Current schema attributes (use these, not old names):
+# - trips.max_passengers (NOT max_capacity)
+# - trips.internal_trip_details (NOT notes)
+# - passengers.trip_name (linking field)
+# - passengers.trip_id (foreign key, nullable)
+# Always verify schema with: psql -U ridiculaptop -d tripbuilder
+
+## 5. Contact Details Button (REQUIRED)
+# All detail pages (trips, passengers, contacts) MUST have:
+# "View in GHL" button linking to:
+# https://app.gohighlevel.com/v2/location/dGKixXhucwniMwOQnZdr/contacts/detail/{contact_id}
+
+## 6. Error Handling Pattern
+# - Outer try/catch for database errors
+# - Inner try/catch for GHL sync errors
+# - Always commit local changes (graceful degradation)
+# - Flash appropriate messages to user
+# - Log errors to console
+
+## 7. Pipeline IDs (DO NOT CHANGE)
+# TripBooking: IlWdPtOpcczLpgsde2KF
+# Passenger: fnsdpRtY9o83Vr4z15bE
+
+## 8. Custom Field Format
+# Always lowercase with prefix: opportunity.fieldname
+# Examples: opportunity.tripname, opportunity.passportnumber
+
+## 9. File Storage (PLANNED - S3)
+# Structure: trips/{trip-name}/passengers/{passenger-name}/{file-type}/
+# Use pre-signed URLs for downloads (1 hour expiration)
+# Save file metadata to database
+
+## 10. Search & Filter
+# - Trip filtering by destination, date range, vendor, status
+# - Passenger search by name, passport status, trip
+# - Date range queries for trip planning
+
+# ==============================================================================
+# TERMINAL & MODE EFFICIENCY (CRITICAL)
+# ==============================================================================
+
+## Terminal Management
+# - Check environment_details BEFORE every command
+# - NEVER use: cd directory && command (creates new terminals!)
+# - ALWAYS reuse existing terminals
+# - Maximum 1-2 terminals per session
+
+## Mode Selection
+# - Architect: .md files only (planning, docs)
+# - Code: Python, JS, HTML, CSS (implementation)
+# - Debug: All files (troubleshooting)
+# - Memory Manager: memory-bank/*.md, docs/*.md (doc updates)
+# - Database: .py, .sql (schema changes, migrations)
+# - File Manager: .py, .html (S3 operations)
+# - API Integration: .py (GHL API work)
+
+# ==============================================================================
+# DEVELOPMENT WORKFLOW
+# ==============================================================================
+
+## Starting Development
+# cd /Users/ridiculaptop/Downloads/claude_code_tripbuilder
+# source .venv/bin/activate
+# cd tripbuilder
+
+## Running Application
+# python app.py
+# Access at http://localhost:5269
+
+## Database Operations
+# flask init-db                    # Initialize database
+# psql -U ridiculaptop -d tripbuilder  # Access database
+
+## Sync Operations
+# flask sync-ghl                   # Full sync from GHL
+
+# ==============================================================================
+# KNOWN ISSUES TO ADDRESS
+# ==============================================================================
+
+# 1. Template Schema Updates Needed
+# - Check all templates for trips.max_capacity → trips.max_passengers
+# - Check all templates for trips.notes → trips.internal_trip_details
+# - Verify all route handlers use correct attribute names
+
+# 2. Contact Details Button Missing
+# - Add to trips/detail.html
+# - Add to passengers/detail.html
+# - Add to contacts/detail.html
+
+# 3. S3 File Management (Not Yet Implemented)
+# - AWS S3 bucket configuration
+# - File upload routes
+# - Pre-signed URL generation
+# - File metadata tracking
+
+# ==============================================================================
+# DOCUMENTATION HIERARCHY
+# ==============================================================================
+
+# Primary (Most Current):
+# 1. memory-bank/projectBrief.md - Requirements & scope
+# 2. memory-bank/progress.md - Completed work & next steps
+# 3. memory-bank/activeContext.md - Current focus
+# 4. memory-bank/techContext.md - Tech stack
+# 5. memory-bank/systemPatterns.md - Code patterns
+
+# Secondary (TripBuilder-specific):
+# 6. tripbuilder/README.md - Setup guide
+# 7. tripbuilder/TWO_WAY_SYNC_COMPLETE.md - Sync documentation
+# 8. tripbuilder/PASSENGER_LINKING_COMPLETE.md - Linking process
+
+# Outdated (DO NOT UPDATE):
+# - Root-level .md files (PROJECT_DESCRIPTION.md, etc.)
+
+# ==============================================================================
+# SUCCESS CRITERIA
+# ==============================================================================
+
+# You're doing it right when:
+# ✅ 1-2 terminals max per session
+# ✅ Zero cd && command usage
+# ✅ Zero mode restriction violations
+# ✅ All schema attributes correct
+# ✅ Contact Details buttons on all detail pages
+# ✅ Bidirectional sync working
+# ✅ Error handling in place
+# ✅ Documentation stays current
+
+# ==============================================================================
+# END OF RULES
+# ==============================================================================
+
+# Last Updated: October 27, 2025
+# Project: TripBuilder
+# Build Location: tripbuilder/
+# Status: Active & Mandatory

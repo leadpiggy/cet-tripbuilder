@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+
+{% block title %}Passenger Details - TripBuilder{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('trip_detail', trip_id=passenger.trip.id) }}">{{ passenger.trip.destination }}</a></li>
+                <li class="breadcrumb-item active">{{ passenger.contact.firstname }} {{ passenger.contact.lastname }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col">
+        <h1><i class="bi bi-person-badge"></i> {{ passenger.contact.firstname }} {{ passenger.contact.lastname }}</h1>
+        <p class="text-muted">Passenger on {{ passenger.trip.destination }}</p>
+    </div>
+    <div class="col text-end">
+        {% if passenger.id %}
+        <a href="https://app.gohighlevel.com/location/{{ ghl_location_id }}/opportunities/all/{{ passenger.id }}" target="_blank" class="btn btn-primary">
+            <i class="bi bi-box-arrow-up-right"></i> View in GHL
+        </a>
+        {% endif %}
+        <a href="{{ url_for('contact_detail', contact_id=passenger.contact.id) }}" class="btn btn-outline-primary">
+            <i class="bi bi-person"></i> View Contact
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-info-circle"></i> Passenger Information</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-borderless">
+            <tr>
+                <th width="30%"><i class="bi bi-airplane"></i> Trip:</th>
+                <td><a href="{{ url_for('trip_detail', trip_id=passenger.trip.id) }}">{{ passenger.trip.destination }}</a></td>
+            </tr>
+            {% if passenger.stage %}
+            <tr>
+                <th><i class="bi bi-diagram-3"></i> Current Stage:</th>
+                <td><span class="badge bg-info">{{ passenger.stage.name }}</span></td>
+            </tr>
+            {% endif %}
+            {% if passenger.id %}
+            <tr>
+                <th><i class="bi bi-link-45deg"></i> GHL Opportunity:</th>
+                <td><code>{{ passenger.id }}</code></td>
+            </tr>
+            {% endif %}
+            <tr>
+                <th><i class="bi bi-envelope"></i> Email:</th>
+                <td>{{ passenger.contact.email }}</td>
+            </tr>
+            <tr>
+                <th><i class="bi bi-telephone"></i> Phone:</th>
+                <td>{{ passenger.contact.phone or 'Not provided' }}</td>
+            </tr>
+        </table>
+        
+        <hr>
+        
+        <p class="text-muted"><i class="bi bi-info-circle"></i> Additional custom field details will be displayed here in future updates.</p>
+    </div>
+</div>
+
+<!-- File Upload Section -->
+<div class="card mt-4">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="bi bi-cloud-upload"></i> Document Uploads</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <!-- Passport Upload -->
+            <div class="col-md-4 mb-3">
+                <h6><i class="bi bi-passport"></i> Passport Photo</h6>
+                <form action="{{ url_for('upload_passport', passenger_id=passenger.id) }}" method="POST" enctype="multipart/form-data">
+                    <div class="input-group mb-2">
+                        <input type="file" class="form-control" name="passport" accept="image/*" required>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-upload"></i> Upload
+                        </button>
+                    </div>
+                </form>
+                {% if passenger.passport_file %}
+                <small class="text-success"><i class="bi bi-check-circle"></i> Passport uploaded</small>
+                {% endif %}
+            </div>
+            
+            <!-- Signature Upload -->
+            <div class="col-md-4 mb-3">
+                <h6><i class="bi bi-pen"></i> Digital Signature</h6>
+                <button type="button" class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#signatureModal">
+                    <i class="bi bi-pen"></i> Capture Signature
+                </button>
+                {% if passenger.passenger_signature %}
+                <small class="text-success mt-2 d-block"><i class="bi bi-check-circle"></i> Signature captured</small>
+                {% endif %}
+            </div>
+            
+            <!-- Document Upload -->
+            <div class="col-md-4 mb-3">
+                <h6><i class="bi bi-file-earmark-pdf"></i> Documents</h6>
+                <form action="{{ url_for('upload_document', passenger_id=passenger.id) }}" method="POST" enctype="multipart/form-data">
+                    <select class="form-select mb-2" name="document_type" required>
+                        <option value="">Select type...</option>
+                        <option value="reservation">Reservation</option>
+                        <option value="mou">MOU</option>
+                        <option value="affidavit">Affidavit</option>
+                        <option value="document">Other Document</option>
+                    </select>
+                    <div class="input-group">
+                        <input type="file" class="form-control" name="document" accept="application/pdf,image/*" required>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-upload"></i> Upload
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <hr>
+        
+        <!-- File List -->
+        <div id="fileList">
+            <h6><i class="bi bi-folder2-open"></i> Uploaded Files</h6>
+            <div class="list-group" id="filesContainer">
+                <div class="text-muted">Loading files...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Signature Capture Modal -->
+<div class="modal fade" id="signatureModal" tabindex="-1" aria-labelledby="signatureModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="signatureModalLabel"><i class="bi bi-pen"></i> Capture Signature</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="border rounded p-3 bg-light">
+                    <canvas id="signaturePad" width="700" height="300" style="border: 2px dashed #ccc; background: white; cursor: crosshair;"></canvas>
+                </div>
+                <div class="mt-3">
+                    <button type="button" class="btn btn-secondary" id="clearSignature">
+                        <i class="bi bi-trash"></i> Clear
+                    </button>
+                    <span class="text-muted ms-3"><i class="bi bi-info-circle"></i> Sign above using your mouse or touch screen</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveSignature">
+                    <i class="bi bi-save"></i> Save Signature
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Load files for this passenger
+document.addEventListener('DOMContentLoaded', function() {
+    loadPassengerFiles();
+    initSignaturePad();
+});
+
+function loadPassengerFiles() {
+    fetch('/files/list/passenger/{{ passenger.id }}')
+        .then(response => response.json())
+        .then(files => {
+            const container = document.getElementById('filesContainer');
+            if (files.length === 0) {
+                container.innerHTML = '<div class="text-muted">No files uploaded yet.</div>';
+            } else {
+                container.innerHTML = files.map(file => `
+                    <a href="${file.download_url}" class="list-group-item list-group-item-action" target="_blank">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">
+                                <i class="bi bi-${getFileIcon(file.file_type)}"></i> ${file.filename}
+                            </h6>
+                            <small class="text-muted">${formatFileSize(file.file_size)}</small>
+                        </div>
+                        <small class="text-muted">${file.file_type} - Uploaded: ${new Date(file.uploaded_at).toLocaleDateString()}</small>
+                    </a>
+                `).join('');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading files:', error);
+            document.getElementById('filesContainer').innerHTML = '<div class="text-danger">Error loading files.</div>';
+        });
+}
+
+function getFileIcon(fileType) {
+    const icons = {
+        'passport': 'passport',
+        'signature': 'pen',
+        'reservation': 'file-earmark-text',
+        'mou': 'file-earmark-check',
+        'affidavit': 'file-earmark-medical',
+        'document': 'file-earmark-pdf'
+    };
+    return icons[fileType] || 'file-earmark';
+}
+
+function formatFileSize(bytes) {
+    if (!bytes) return 'Unknown size';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+// Signature pad functionality
+let canvas, ctx, drawing = false;
+
+function initSignaturePad() {
+    canvas = document.getElementById('signaturePad');
+    if (!canvas) return;
+    
+    ctx = canvas.getContext('2d');
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    
+    // Mouse events
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+    
+    // Touch events
+    canvas.addEventListener('touchstart', handleTouch);
+    canvas.addEventListener('touchmove', handleTouch);
+    canvas.addEventListener('touchend', stopDrawing);
+    
+    // Clear button
+    document.getElementById('clearSignature').addEventListener('click', clearSignature);
+    
+    // Save button
+    document.getElementById('saveSignature').addEventListener('click', saveSignature);
+}
+
+function startDrawing(e) {
+    drawing = true;
+    ctx.beginPath();
+    ctx.moveTo(e.offsetX, e.offsetY);
+}
+
+function draw(e) {
+    if (!drawing) return;
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.stroke();
+}
+
+function stopDrawing() {
+    drawing = false;
+}
+
+function handleTouch(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+    
+    if (e.type === 'touchstart') {
+        drawing = true;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    } else if (e.type === 'touchmove' && drawing) {
+        ctx.lineTo(x, y);
+        ctx.stroke();
+    }
+}
+
+function clearSignature() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function saveSignature() {
+    const dataURL = canvas.toDataURL('image/png');
+    
+    fetch('/upload/signature/{{ passenger.id }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ signature: dataURL })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Signature saved successfully!');
+            bootstrap.Modal.getInstance(document.getElementById('signatureModal')).hide();
+            location.reload();
+        } else {
+            alert('Error saving signature: ' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error);
+    });
+}
+</script>
+{% endblock %}

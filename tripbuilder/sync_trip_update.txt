@@ -1,0 +1,109 @@
+# Snippet to update sync_trip_opportunities method
+# Insert this at line ~230 in ghl_sync.py
+
+def sync_trip_opportunities(self, limit=100):
+    """
+    Sync TripBooking opportunities from GHL → trips table.
+    
+    Fetches all opportunities from TripBooking pipeline (IlWdPtOpcczLpgsde2KF)
+    and creates/updates Trip records in local database.
+    Uses field_mapping to convert GHL custom fields to DB columns.
+    
+    Args:
+        limit: Number of opportunities per page
+    
+    Returns:
+        int: Total trips synced
+    """
+    print("🗺️  Syncing TripBooking opportunities...")
+    
+    from field_mapping import parse_ghl_custom_fields, map_trip_custom_fields
+    from datetime import date, timedelta
+    import uuid
+    
+    # TripBooking pipeline ID from PIPELINE_CUSTOM_FIELD_DATA.md
+    TRIPBOOKING_PIPELINE_ID = "IlWdPtOpcczLpgsde2KF"
+    
+    trip_count = 0
+    page = 1
+    
+    while True:
+        try:
+            response = self.api.search_opportunities(
+                pipeline_id=TRIPBOOKING_PIPELINE_ID,
+                limit=limit,
+                page=page
+            )
+            opportunities_data = response.get('opportunities', [])
+            total = response.get('total', 0)
+            
+            if not opportunities_data:
+                break
+            
+            print(f"   📦 Page {page}: {len(opportunities_data)} opps (synced: {trip_count}/{total})")
+            
+            # Process each trip
+            for opp_data in opportunities_data:
+                opp_id = opp_data.get('id')
+                if not opp_id:
+                    continue
+                
+                # Check if trip already exists
+                trip = Trip.query.filter_by(ghl_opportunity_id=opp_id).first()
+                if not trip:
+                    trip = Trip()
+                    trip.public_id = str(uuid.uuid4())
+                
+                trip.ghl_opportunity_id = opp_id
+                
+                # Get custom fields and parse them
+                custom_fields_list = opp_data.get('custom_fields', [])
+                custom_fields_dict = parse_ghl_custom_fields(custom_fields_list)
+                
+                # Map custom fields to model columns
+                mapped_fields = map_trip_custom_fields(custom_fields_dict)
+                
+                # Set basic fields from opportunity
+                trip.name = opp_data.get('name', 'Unnamed Trip')
+                trip.destination = opp_data.get('name', 'Unknown Destination')
+                trip.contact_id = opp_data.get('contactId')
+                trip.status = opp_data.get('status', 'planning')
+                
+                # Apply mapped custom fields
+                for column, value in mapped_fields.items():
+                    if hasattr(trip, column) and value is not None:
+                        setattr(trip, column, value)
+                
+                # Ensure we have start/end dates
+                if not trip.start_date:
+                    trip.start_date = mapped_fields.get('arrival_date') or date.today()
+                if not trip.end_date:
+                    trip.end_date = mapped_fields.get('return_date') or (trip.start_date + timedelta(days=7))
+                
+                # Set timestamps
+                if not trip.created_at:
+                    trip.created_at = datetime.utcnow()
+                trip.updated_at = datetime.utcnow()
+                
+                db.session.add(trip)
+                trip_count += 1
+            
+            # Commit batch
+            try:
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                print(f"   ⚠️  Error: {e}")
+            
+            # Check if done
+            if trip_count >= total:
+                break
+            
+            page += 1
+            
+        except Exception as e:
+            print(f"   ⚠️  Error: {e}")
+            break
+    
+    print(f"   ✅ Synced {trip_count} trips")
+    return trip_count

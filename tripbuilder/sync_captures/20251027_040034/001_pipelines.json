@@ -1,0 +1,102 @@
+{
+  "pipelines": [
+    {
+      "stages": [
+        {
+          "id": "62c0b80d-6e56-4775-9d93-fbc96fda92e7",
+          "name": "AddedToTrip",
+          "position": 0,
+          "showInFunnel": true,
+          "showInPieChart": true
+        },
+        {
+          "id": "5019844d-b9bd-43ef-b027-e966f279bf96",
+          "name": "DetailsSubmitted",
+          "position": 1,
+          "showInFunnel": true,
+          "showInPieChart": true
+        },
+        {
+          "id": "b55fba98-5ca4-4b5a-8c75-97c43ae1bab0",
+          "name": "TripDetailsSent",
+          "position": 2,
+          "showInFunnel": true,
+          "showInPieChart": true
+        },
+        {
+          "id": "d63f1360-81db-40ce-8a4c-ca00516f64d8",
+          "name": "TripReady",
+          "position": 3,
+          "showInFunnel": true,
+          "showInPieChart": true
+        },
+        {
+          "id": "4b4a6f25-853d-487d-8db1-48371d427573",
+          "name": "TripInProgress",
+          "position": 4,
+          "showInFunnel": true,
+          "showInPieChart": true
+        },
+        {
+          "id": "dfca0535-a466-4ded-af60-6c0c3a677b8c",
+          "name": "TripComplete",
+          "position": 5,
+          "showInFunnel": true,
+          "showInPieChart": true
+        }
+      ],
+      "dateAdded": "2025-08-03T14:27:37.765Z",
+      "dateUpdated": "2025-08-11T08:49:15.147Z",
+      "name": "Passenger",
+      "showInFunnel": true,
+      "showInPieChart": true,
+      "id": "fnsdpRtY9o83Vr4z15bE"
+    },
+    {
+      "stages": [
+        {
+          "id": "027508e9-939c-4646-bb59-66970fe674fe",
+          "name": "FormSubmit",
+          "position": 0,
+          "showInFunnel": true,
+          "showInPieChart": true
+        },
+        {
+          "id": "8927d13e-bdd8-45db-a55a-96b9057d3676",
+          "name": "TripFinalized",
+          "position": 1,
+          "showInFunnel": true,
+          "showInPieChart": true
+        },
+        {
+          "id": "635ba2fa-9270-40ac-8ff9-259a5487ce72",
+          "name": "TravelersAdded",
+          "position": 2,
+          "showInFunnel": true,
+          "showInPieChart": true
+        },
+        {
+          "id": "19d3c6b2-cc55-40cb-973c-4ba603e6d19a",
+          "name": "TripScheduled",
+          "position": 3,
+          "showInFunnel": true,
+          "showInPieChart": true
+        },
+        {
+          "id": "56c0708d-48ef-4cb5-873a-c7785b566448",
+          "name": "TripComplete",
+          "position": 4,
+          "showInFunnel": true,
+          "showInPieChart": true
+        }
+      ],
+      "dateAdded": "2025-08-03T14:25:38.145Z",
+      "dateUpdated": "2025-09-12T16:28:54.969Z",
+      "name": "TripBooking",
+      "showInFunnel": true,
+      "showInPieChart": true,
+      "id": "IlWdPtOpcczLpgsde2KF"
+    }
+  ],
+  "traceId": "9e5c8df0-f91d-46db-9d4b-fac4db17ed31"
+}

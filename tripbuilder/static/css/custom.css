@@ -1,0 +1,68 @@
+/* TripBuilder Custom Styles */
+
+/* Body and Layout */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Navbar */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+/* Cards */
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    font-weight: 600;
+}
+
+/* Stats Cards */
+.card.bg-primary,
+.card.bg-success,
+.card.bg-info {
+    border: none;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 0.375rem;
+}
+
+/* Tables */
+.table th {
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Badges */
+.badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+}
+
+/* Forms */
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+/* Flash Messages */
+.alert {
+    border-radius: 0.375rem;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+}

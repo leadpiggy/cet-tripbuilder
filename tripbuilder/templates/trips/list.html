@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}Trips - TripBuilder{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1><i class="bi bi-map"></i> All Trips</h1>
+    </div>
+    <div class="col text-end">
+        <a href="{{ url_for('trip_new') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Create New Trip
+        </a>
+    </div>
+</div>
+
+<!-- Search and Filter Section -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="bi bi-funnel"></i> Search & Filter
+            <button class="btn btn-sm btn-link float-end" type="button" data-bs-toggle="collapse" data-bs-target="#filterPanel" aria-expanded="true">
+                <i class="bi bi-chevron-down"></i>
+            </button>
+        </h5>
+    </div>
+    <div class="collapse show" id="filterPanel">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('trip_list') }}" id="filterForm">
+                <div class="row g-3">
+                    <!-- General Search -->
+                    <div class="col-md-6">
+                        <label for="search" class="form-label">
+                            <i class="bi bi-search"></i> General Search
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="search" 
+                               name="search" 
+                               placeholder="Search destination, name, description, vendor..."
+                               value="{{ search_term }}">
+                        <small class="text-muted">Searches across multiple fields</small>
+                    </div>
+                    
+                    <!-- Passenger Search -->
+                    <div class="col-md-6">
+                        <label for="passenger_search" class="form-label">
+                            <i class="bi bi-person"></i> Passenger Name
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="passenger_search" 
+                               name="passenger_search" 
+                               placeholder="Search by passenger name..."
+                               value="{{ passenger_search }}">
+                        <small class="text-muted">Find trips with specific passengers</small>
+                    </div>
+                    
+                    <!-- Destination Filter -->
+                    <div class="col-md-4">
+                        <label for="destination" class="form-label">
+                            <i class="bi bi-geo-alt"></i> Destination
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="destination" 
+                               name="destination" 
+                               list="destinationList"
+                               placeholder="Filter by destination..."
+                               value="{{ destination }}">
+                        <datalist id="destinationList">
+                            {% for dest in all_destinations %}
+                            <option value="{{ dest }}">
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                    
+                    <!-- Travel Category -->
+                    <div class="col-md-4">
+                        <label for="travel_category" class="form-label">
+                            <i class="bi bi-tag"></i> Travel Category
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="travel_category" 
+                               name="travel_category" 
+                               list="categoryList"
+                               placeholder="Filter by category..."
+                               value="{{ travel_category }}">
+                        <datalist id="categoryList">
+                            {% for cat in all_categories %}
+                            <option value="{{ cat }}">
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                    
+                    <!-- Status Filter -->
+                    <div class="col-md-4">
+                        <label for="status" class="form-label">
+                            <i class="bi bi-flag"></i> Status
+                        </label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="">All Statuses</option>
+                            {% for st in all_statuses %}
+                            <option value="{{ st }}" {% if status == st %}selected{% endif %}>
+                                {{ st|title }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Date Range -->
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            <i class="bi bi-calendar-range"></i> Start Date Range
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">From</span>
+                            <input type="date" 
+                                   class="form-control" 
+                                   id="start_date_from" 
+                                   name="start_date_from"
+                                   value="{{ start_date_from }}">
+                            <span class="input-group-text">To</span>
+                            <input type="date" 
+                                   class="form-control" 
+                                   id="start_date_to" 
+                                   name="start_date_to"
+                                   value="{{ start_date_to }}">
+                        </div>
+                        <small class="text-muted">Find trips starting within this date range</small>
+                    </div>
+                    
+                    <!-- Capacity Range -->
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            <i class="bi bi-people"></i> Capacity Range
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">Min</span>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="min_capacity" 
+                                   name="min_capacity"
+                                   placeholder="Min passengers"
+                                   min="0"
+                                   value="{{ min_capacity }}">
+                            <span class="input-group-text">Max</span>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="max_capacity" 
+                                   name="max_capacity"
+                                   placeholder="Max passengers"
+                                   min="0"
+                                   value="{{ max_capacity }}">
+                        </div>
+                        <small class="text-muted">Filter by maximum trip capacity</small>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="col-12">
+                        <hr>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Apply Filters
+                        </button>
+                        <a href="{{ url_for('trip_list') }}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Clear All
+                        </a>
+                        <span class="text-muted ms-3">
+                            <i class="bi bi-info-circle"></i> 
+                            Found <strong id="tripCount">{{ trips|length }}</strong> trip(s)
+                        </span>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Results Section -->
+{% if trips %}
+<div class="row" id="tripsContainer">
+    {% for trip in trips %}
+    <div class="col-md-4 mb-4 trip-card">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">
+                    {{ trip.destination }}
+                    {% if trip.status %}
+                    <span class="badge bg-{{ 'success' if trip.status == 'active' else 'secondary' }} float-end">
+                        {{ trip.status|title }}
+                    </span>
+                    {% endif %}
+                </h5>
+                {% if trip.name and trip.name != trip.destination %}
+                <p class="card-subtitle mb-2 text-muted">{{ trip.name }}</p>
+                {% endif %}
+                
+                <p class="card-text">
+                    <small class="text-muted">
+                        <i class="bi bi-calendar3"></i> 
+                        {% if trip.start_date and trip.end_date %}
+                        {{ trip.start_date.strftime('%b %d') }} - {{ trip.end_date.strftime('%b %d, %Y') }}
+                        {% else %}
+                        Dates TBD
+                        {% endif %}
+                    </small>
+                </p>
+                
+                {% if trip.travel_category %}
+                <p class="card-text">
+                    <small><i class="bi bi-tag"></i> {{ trip.travel_category }}</small>
+                </p>
+                {% endif %}
+                
+                <p class="card-text">
+                    <span class="badge bg-info">
+                        <i class="bi bi-people"></i> 
+                        {{ trip.passengers|length if trip.passengers else 0 }} / 
+                        {{ trip.max_passengers if trip.max_passengers else 'N/A' }} passengers
+                    </span>
+                </p>
+                
+                {% if trip.internal_trip_details %}
+                <p class="card-text"><small>{{ trip.internal_trip_details[:100] }}{% if trip.internal_trip_details|length > 100 %}...{% endif %}</small></p>
+                {% endif %}
+                
+                {% if trip.passengers %}
+                <div class="mt-2">
+                    <small class="text-muted">
+                        <i class="bi bi-person-check"></i> Passengers: 
+                        {% for passenger in trip.passengers[:3] %}
+                            {{ passenger.firstname }} {{ passenger.lastname[:1] }}.{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                        {% if trip.passengers|length > 3 %}
+                            <span class="badge bg-secondary">+{{ trip.passengers|length - 3 }} more</span>
+                        {% endif %}
+                    </small>
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-transparent">
+                <a href="{{ url_for('trip_detail', trip_id=trip.id) }}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-eye"></i> View
+                </a>
+                <a href="{{ url_for('enroll_passenger', trip_id=trip.id) }}" class="btn btn-sm btn-success">
+                    <i class="bi bi-person-plus"></i> Enroll
+                </a>
+                <a href="{{ url_for('trip_edit', trip_id=trip.id) }}" class="btn btn-sm btn-warning">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> 
+    {% if search_term or destination or start_date_from or start_date_to or status or travel_category or passenger_search %}
+    No trips match your search criteria. <a href="{{ url_for('trip_list') }}" class="alert-link">Clear filters</a> to see all trips.
+    {% else %}
+    No trips yet. <a href="{{ url_for('trip_new') }}" class="alert-link">Create your first trip</a>!
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

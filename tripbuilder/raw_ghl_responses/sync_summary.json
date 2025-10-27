@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-10-27T04:49:10.803015",
+  "location_id": "dGKixXhucwniMwOQnZdr",
+  "counts": {
+    "custom_fields": 53,
+    "trips": 100,
+    "passengers": 100
+  },
+  "errors": [
+    "Contacts: ['property offset should not exist']"
+  ],
+  "pipelines": {
+    "trip": "IlWdPtOpcczLpgsde2KF",
+    "passenger": "fnsdpRtY9o83Vr4z15bE"
+  }
+}

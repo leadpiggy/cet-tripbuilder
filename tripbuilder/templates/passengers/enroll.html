@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Enroll in {{ trip.destination }} - TripBuilder{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('trip_list') }}">Trips</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('trip_detail', trip_id=trip.id) }}">{{ trip.destination }}</a></li>
+                <li class="breadcrumb-item active">Enroll</li>
+            </ol>
+        </nav>
+        
+        <h1><i class="bi bi-person-plus"></i> Enroll in Trip</h1>
+        <p class="lead">{{ trip.destination }}</p>
+        <p class="text-muted">{{ trip.start_date.strftime('%B %d') }} - {{ trip.end_date.strftime('%B %d, %Y') }}</p>
+        
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Passenger Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <h6 class="border-bottom pb-2 mb-3">Basic Information</h6>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="firstname" class="form-label">First Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="firstname" name="firstname" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="lastname" class="form-label">Last Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="lastname" name="lastname" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                        <small class="form-text text-muted">We'll check if you already have an account</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" placeholder="+1 (555) 123-4567">
+                    </div>
+                    
+                    <h6 class="border-bottom pb-2 mb-3 mt-4">Address (Optional)</h6>
+                    
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Street Address</label>
+                        <input type="text" class="form-control" id="address" name="address">
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" class="form-control" id="city" name="city">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="state" class="form-label">State</label>
+                            <input type="text" class="form-control" id="state" name="state" placeholder="TX">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="postal_code" class="form-label">ZIP Code</label>
+                            <input type="text" class="form-control" id="postal_code" name="postal_code">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="country" class="form-label">Country</label>
+                        <input type="text" class="form-control" id="country" name="country" value="United States">
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> After enrolling, you'll be able to submit additional required information (passport details, health information, emergency contacts, etc.)
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('trip_detail', trip_id=trip.id) }}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Enroll in Trip
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Vendors - TripBuilder{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Trip Vendors</h1>
+        <a href="{{ url_for('vendor_create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add New Vendor
+        </a>
+    </div>
+
+    {% if vendors %}
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Trips Using</th>
+                        <th>Created</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vendor in vendors %}
+                    <tr>
+                        <td><strong>{{ vendor.name }}</strong></td>
+                        <td>{{ vendor.description[:100] if vendor.description else '-' }}</td>
+                        <td>
+                            {% if vendor.trips %}
+                                <span class="badge bg-info">{{ vendor.trips|length }} trip(s)</span>
+                            {% else %}
+                                <span class="text-muted">None</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ vendor.created_at.strftime('%b %d, %Y') if vendor.created_at else '-' }}</td>
+                        <td class="text-end">
+                            <a href="{{ url_for('vendor_edit', vendor_id=vendor.id) }}" 
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                            <form action="{{ url_for('vendor_delete', vendor_id=vendor.id) }}" 
+                                  method="POST" 
+                                  style="display: inline;"
+                                  onsubmit="return confirm('Are you sure you want to delete vendor \'{{ vendor.name }}\'? {% if vendor.trips %}This vendor is assigned to {{ vendor.trips|length }} trip(s).{% endif %}');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No vendors found. 
+        <a href="{{ url_for('vendor_create') }}">Create your first vendor</a> or run GHL sync to import vendors.
+    </div>
+    {% endif %}
+
+    <div class="mt-4">
+        <p class="text-muted">
+            <i class="bi bi-info-circle"></i> Vendors are automatically synced with GoHighLevel. 
+            Creating or deleting vendors here will update the dropdown options in GHL.
+        </p>
+    </div>
+</div>
+{% endblock %}

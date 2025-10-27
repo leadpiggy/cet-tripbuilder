@@ -1,0 +1,68 @@
+{% extends "enrollment/base_wizard.html" %}
+
+{% block step_content %}
+<div class="form-section">
+    <h3 class="mb-4">
+        <i class="bi bi-info-circle"></i> Trip Information
+    </h3>
+    
+    <div class="alert alert-info">
+        <i class="bi bi-check-circle"></i> Review the trip details above. This is the trip you're enrolling in.
+    </div>
+
+    {% if trip.trip_description %}
+    <div class="mb-4">
+        <h5>Trip Description</h5>
+        <p>{{ trip.trip_description }}</p>
+    </div>
+    {% endif %}
+
+    {% if trip.vendor %}
+    <div class="mb-4">
+        <h5>Trip Vendor</h5>
+        <p>{{ trip.vendor.name }}</p>
+        {% if trip.vendor.description %}
+        <small class="text-muted">{{ trip.vendor.description }}</small>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <h6>Arrival Date</h6>
+            <p>{{ trip.arrival_date.strftime('%B %d, %Y') if trip.arrival_date else trip.start_date.strftime('%B %d, %Y') if trip.start_date else 'TBD' }}</p>
+        </div>
+        <div class="col-md-6 mb-3">
+            <h6>Return Date</h6>
+            <p>{{ trip.return_date.strftime('%B %d, %Y') if trip.return_date else trip.end_date.strftime('%B %d, %Y') if trip.end_date else 'TBD' }}</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <h6>Total Nights</h6>
+            <p>{{ trip.nights_total or 'TBD' }}</p>
+        </div>
+        <div class="col-md-6 mb-3">
+            <h6>Lodging</h6>
+            <p>{{ trip.lodging or 'TBD' }}</p>
+        </div>
+    </div>
+
+    {% if trip.internal_trip_details %}
+    <div class="alert alert-warning">
+        <strong>Important Trip Details:</strong>
+        <p class="mb-0">{{ trip.internal_trip_details }}</p>
+    </div>
+    {% endif %}
+
+    <div class="wizard-nav">
+        <a href="{{ url_for('trip_detail', trip_id=trip.id) }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Trip
+        </a>
+        <a href="{{ url_for('enrollment_step', trip_id=trip.id, step=2) }}" class="btn btn-primary">
+            Begin Enrollment <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+</div>
+{% endblock %}

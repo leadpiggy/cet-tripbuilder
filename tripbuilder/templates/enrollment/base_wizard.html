@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Enroll in {{ trip.name }} - TripBuilder{% endblock %}
+
+{% block content %}
+<div class="enrollment-wizard">
+    <!-- Static Trip Header (stays throughout enrollment) -->
+    <div class="trip-header bg-light border rounded p-4 mb-4">
+        <div class="row">
+            <div class="col-md-8">
+                <h2 class="mb-2">
+                    <i class="bi bi-airplane"></i> {{ trip.name or trip.destination }}
+                </h2>
+                <p class="mb-1">
+                    <strong>Destination:</strong> {{ trip.destination }}
+                </p>
+                <p class="mb-1">
+                    <strong>Dates:</strong> 
+                    {{ trip.start_date.strftime('%B %d, %Y') if trip.start_date else 'TBD' }} - 
+                    {{ trip.end_date.strftime('%B %d, %Y') if trip.end_date else 'TBD' }}
+                </p>
+                {% if trip.travel_category %}
+                <p class="mb-0">
+                    <strong>Travel Category:</strong> {{ trip.travel_category }}
+                </p>
+                {% endif %}
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="capacity-indicator">
+                    <h4 class="text-muted">Capacity</h4>
+                    <p class="display-6">
+                        <span class="text-primary">{{ trip.current_passengers or 0 }}</span> / 
+                        <span class="text-secondary">{{ trip.max_passengers or 10 }}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-wizard mb-5">
+        <div class="progress-step {% if current_step >= 1 %}active{% endif %} {% if wizard.step_1_complete %}complete{% endif %}">
+            <div class="step-number">1</div>
+            <div class="step-label">Trip Info</div>
+        </div>
+        <div class="progress-connector {% if wizard.step_1_complete %}complete{% endif %}"></div>
+        
+        <div class="progress-step {% if current_step >= 2 %}active{% endif %} {% if wizard.step_2_complete %}complete{% endif %}">
+            <div class="step-number">2</div>
+            <div class="step-label">Passenger Info</div>
+        </div>
+        <div class="progress-connector {% if wizard.step_2_complete %}complete{% endif %}"></div>
+        
+        <div class="progress-step {% if current_step >= 3 %}active{% endif %} {% if wizard.step_3_complete %}complete{% endif %}">
+            <div class="step-number">3</div>
+            <div class="step-label">Passport</div>
+        </div>
+        <div class="progress-connector {% if wizard.step_3_complete %}complete{% endif %}"></div>
+        
+        <div class="progress-step {% if current_step >= 4 %}active{% endif %} {% if wizard.step_4_complete %}complete{% endif %}">
+            <div class="step-number">4</div>
+            <div class="step-label">Health</div>
+        </div>
+        <div class="progress-connector {% if wizard.step_4_complete %}complete{% endif %}"></div>
+        
+        <div class="progress-step {% if current_step >= 5 %}active{% endif %} {% if wizard.step_5_complete %}complete{% endif %}">
+            <div class="step-number">5</div>
+            <div class="step-label">Signature</div>
+        </div>
+    </div>
+
+    <!-- Step Content -->
+    <div class="step-content">
+        {% block step_content %}{% endblock %}
+    </div>
+</div>
+
+<style>
+/* Progress Bar Styling */
+.progress-bar-wizard {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 40px 0;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.step-number {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #dee2e6;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    border: 3px solid #dee2e6;
+}
+
+.progress-step.active .step-number {
+    background: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.2);
+}
+
+.progress-step.complete .step-number {
+    background: #198754;
+    color: white;
+    border-color: #198754;
+}
+
+.progress-step.complete .step-number::after {
+    content: "✓";
+    position: absolute;
+    font-size: 24px;
+}
+
+.step-label {
+    font-size: 14px;
+    color: #6c757d;
+    white-space: nowrap;
+}
+
+.progress-step.active .step-label {
+    color: #0d6efd;
+    font-weight: bold;
+}
+
+.progress-step.complete .step-label {
+    color: #198754;
+}
+
+.progress-connector {
+    width: 80px;
+    height: 3px;
+    background: #dee2e6;
+    margin: 0 10px;
+    margin-bottom: 35px;
+}
+
+.progress-connector.complete {
+    background: #198754;
+}
+
+/* Trip Header Styling */
+.trip-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.trip-header h2 {
+    color: white;
+}
+
+.trip-header strong {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.capacity-indicator {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 15px;
+    border-radius: 8px;
+}
+
+/* Form Styling */
+.step-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-section {
+    background: white;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.wizard-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #dee2e6;
+}
+</style>
+{% endblock %}

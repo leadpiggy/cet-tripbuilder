@@ -1,0 +1,80 @@
+[
+  {
+    "id": "fnsdpRtY9o83Vr4z15bE",
+    "name": "Passenger",
+    "stages": [
+      {
+        "id": "62c0b80d-6e56-4775-9d93-fbc96fda92e7",
+        "name": "AddedToTrip",
+        "position": 0,
+        "pipeline_id": "fnsdpRtY9o83Vr4z15bE"
+      },
+      {
+        "id": "5019844d-b9bd-43ef-b027-e966f279bf96",
+        "name": "DetailsSubmitted",
+        "position": 1,
+        "pipeline_id": "fnsdpRtY9o83Vr4z15bE"
+      },
+      {
+        "id": "b55fba98-5ca4-4b5a-8c75-97c43ae1bab0",
+        "name": "TripDetailsSent",
+        "position": 2,
+        "pipeline_id": "fnsdpRtY9o83Vr4z15bE"
+      },
+      {
+        "id": "d63f1360-81db-40ce-8a4c-ca00516f64d8",
+        "name": "TripReady",
+        "position": 3,
+        "pipeline_id": "fnsdpRtY9o83Vr4z15bE"
+      },
+      {
+        "id": "4b4a6f25-853d-487d-8db1-48371d427573",
+        "name": "TripInProgress",
+        "position": 4,
+        "pipeline_id": "fnsdpRtY9o83Vr4z15bE"
+      },
+      {
+        "id": "dfca0535-a466-4ded-af60-6c0c3a677b8c",
+        "name": "TripComplete",
+        "position": 5,
+        "pipeline_id": "fnsdpRtY9o83Vr4z15bE"
+      }
+    ]
+  },
+  {
+    "id": "IlWdPtOpcczLpgsde2KF",
+    "name": "TripBooking",
+    "stages": [
+      {
+        "id": "027508e9-939c-4646-bb59-66970fe674fe",
+        "name": "FormSubmit",
+        "position": 0,
+        "pipeline_id": "IlWdPtOpcczLpgsde2KF"
+      },
+      {
+        "id": "8927d13e-bdd8-45db-a55a-96b9057d3676",
+        "name": "TripFinalized",
+        "position": 1,
+        "pipeline_id": "IlWdPtOpcczLpgsde2KF"
+      },
+      {
+        "id": "635ba2fa-9270-40ac-8ff9-259a5487ce72",
+        "name": "TravelersAdded",
+        "position": 2,
+        "pipeline_id": "IlWdPtOpcczLpgsde2KF"
+      },
+      {
+        "id": "19d3c6b2-cc55-40cb-973c-4ba603e6d19a",
+        "name": "TripScheduled",
+        "position": 3,
+        "pipeline_id": "IlWdPtOpcczLpgsde2KF"
+      },
+      {
+        "id": "56c0708d-48ef-4cb5-873a-c7785b566448",
+        "name": "TripComplete",
+        "position": 4,
+        "pipeline_id": "IlWdPtOpcczLpgsde2KF"
+      }
+    ]
+  }
+]

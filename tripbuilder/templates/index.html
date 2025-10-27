@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - TripBuilder{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1><i class="bi bi-speedometer2"></i> Dashboard</h1>
+        <p class="text-muted">Overview of trips, contacts, and passengers</p>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-map"></i> Trips</h5>
+                <h2 class="card-text">{{ trip_count }}</h2>
+                <a href="{{ url_for('trip_list') }}" class="btn btn-light btn-sm">View All</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-people"></i> Contacts</h5>
+                <h2 class="card-text">{{ contact_count }}</h2>
+                <a href="{{ url_for('contact_list') }}" class="btn btn-light btn-sm">View All</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-person-badge"></i> Passengers</h5>
+                <h2 class="card-text">{{ passenger_count }}</h2>
+                <small class="text-white-50">Total enrollments</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Trips -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Trips</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_trips %}
+                    <div class="list-group">
+                        {% for trip in recent_trips %}
+                        <a href="{{ url_for('trip_detail', trip_id=trip.id) }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ trip.destination }}</h6>
+                                <small class="text-muted">{{ trip.start_date.strftime('%b %d, %Y') }}</small>
+                            </div>
+                            <p class="mb-1">
+                                <small>
+                                    <i class="bi bi-calendar3"></i> {{ trip.start_date.strftime('%m/%d/%Y') }} - {{ trip.end_date.strftime('%m/%d/%Y') }}
+                                    <span class="ms-3"><i class="bi bi-people"></i> {{ trip.passengers|length }} / {{ trip.max_capacity }}</span>
+                                </small>
+                            </p>
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No trips yet. <a href="{{ url_for('trip_new') }}">Create your first trip</a>!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('trip_new') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Create New Trip
+                    </a>
+                    <a href="{{ url_for('trip_list') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-list"></i> View All Trips
+                    </a>
+                    <a href="{{ url_for('contact_list') }}" class="btn btn-outline-success">
+                        <i class="bi bi-people"></i> View Contacts
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pipeline Status (if synced) -->
+        {% if pipelines %}
+        <div class="card mt-3">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-diagram-3"></i> Pipelines</h5>
+            </div>
+            <div class="card-body">
+                {% for pipeline in pipelines %}
+                <div class="mb-2">
+                    <strong>{{ pipeline.name }}</strong>
+                    <small class="text-muted d-block">{{ pipeline.stages|length }} stages</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

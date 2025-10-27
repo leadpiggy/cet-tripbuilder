@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Contacts - TripBuilder{% endblock %}
+
+{% block content %}
+<h1><i class="bi bi-people"></i> Contacts</h1>
+<p class="text-muted">All contacts synced from GoHighLevel</p>
+
+{% if contacts %}
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>City</th>
+                        <th>Tags</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contact in contacts %}
+                    <tr>
+                        <td><strong>{{ contact.firstname }} {{ contact.lastname }}</strong></td>
+                        <td>{{ contact.email }}</td>
+                        <td>{{ contact.phone or '-' }}</td>
+                        <td>{{ contact.city or '-' }}</td>
+                        <td>
+                            {% for tag in contact.tags[:3] %}
+                                <span class="badge bg-secondary">{{ tag }}</span>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('contact_detail', contact_id=contact.id) }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> No contacts synced yet. Run <code>flask sync-ghl</code> to sync from GoHighLevel.
+</div>
+{% endif %}
+{% endblock %}

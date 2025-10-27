@@ -1,0 +1,19 @@
+{
+  "export_time": "2025-10-27T04:02:21.629958",
+  "counts": {
+    "trips": 697,
+    "contacts": 5453,
+    "passengers": 6477,
+    "pipelines": 2
+  },
+  "trip_passenger_stats": {
+    "passengers_with_trip": 0,
+    "passengers_without_trip": 6477
+  },
+  "files": {
+    "trips": "trips.json",
+    "contacts": "contacts.json",
+    "passengers": "passengers.json",
+    "pipelines": "pipelines.json"
+  }
+}
