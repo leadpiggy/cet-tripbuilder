@@ -9,9 +9,32 @@ wheels/
 # Virtual environments
 .venv
 
+# Environment variables and secrets
 .env
 .env.*
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+.env.staging
+
+# Secret files
 secrets.json
+secrets.*.json
+credentials.json
+credentials.*.json
+
+# AWS credentials (extra protection)
+.aws/
+aws-credentials.json
+
+# Database dumps and backups (may contain sensitive data)
+*.sql
+*.dump
+*.backup
+db_backup/
+database_exports/*/
 
 *.duck
 *.cyberduckprofile
