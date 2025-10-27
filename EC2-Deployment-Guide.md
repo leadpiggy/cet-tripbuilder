@@ -22,9 +22,21 @@ ssh -i your-key.pem ec2-user@your-ec2-ip
 # Update system
 sudo yum update -y
 
-# Install Python 3.11+ (if not already installed)
-sudo yum install python3.11 -y
-sudo yum install python3.11-pip -y
+# Install Python 3.13 (compile from source as it's not in default repos)
+# First, install build dependencies
+sudo yum groupinstall "Development Tools" -y
+sudo yum install openssl-devel bzip2-devel libffi-devel zlib-devel -y
+
+# Download and compile Python 3.13
+cd /tmp
+wget https://www.python.org/ftp/python/3.13.0/Python-3.13.0.tgz
+tar xzf Python-3.13.0.tgz
+cd Python-3.13.0
+./configure --enable-optimizations
+sudo make altinstall  # altinstall to not replace system python
+
+# Verify installation
+python3.13 --version
 
 # Install PostgreSQL client (if using external PostgreSQL)
 sudo yum install postgresql15 -y
@@ -37,9 +49,6 @@ sudo yum install nginx -y
 
 # Install Git
 sudo yum install git -y
-
-# Install development tools (needed for some Python packages)
-sudo yum groupinstall "Development Tools" -y
 ```
 
 ---
@@ -97,8 +106,8 @@ sudo chown -R ec2-user:ec2-user /var/www/cet-tripbuilder
 ```bash
 cd /var/www/cet-tripbuilder
 
-# Create virtual environment
-python3.11 -m venv venv
+# Create virtual environment with Python 3.13
+python3.13 -m venv venv
 
 # Activate virtual environment
 source venv/bin/activate
@@ -297,7 +306,8 @@ sudo systemctl restart nginx
 
 ```bash
 # Install Certbot for Let's Encrypt
-sudo yum install certbot python3-certbot-nginx -y
+sudo yum install certbot -y
+sudo python3.13 -m pip install certbot-nginx
 
 # Get certificate (replace with your domain)
 sudo certbot --nginx -d your-domain.com
