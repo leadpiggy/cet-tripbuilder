@@ -64,8 +64,8 @@ aws s3 cp s3://your-bucket/backups/tripbuilder_backup.sql /tmp/
 **On your EC2 instance:**
 
 ```bash
-# Install PostgreSQL 15
-sudo yum install postgresql15-server postgresql15-devel -y
+# Install PostgreSQL 17
+sudo yum install postgresql17-server postgresql17-devel -y
 
 # Initialize PostgreSQL
 sudo postgresql-setup --initdb
@@ -252,7 +252,7 @@ python app.py
 
 1. Go to RDS → Create database
 2. Choose:
-   - **Engine:** PostgreSQL 15.x
+   - **Engine:** PostgreSQL 17.x
    - **Template:** Production (or Dev/Test for lower cost)
    - **DB instance identifier:** tripbuilder-db
    - **Master username:** tripbuilder_admin

@@ -38,11 +38,11 @@ sudo make altinstall  # altinstall to not replace system python
 # Verify installation
 python3.13 --version
 
-# Install PostgreSQL client (if using external PostgreSQL)
-sudo yum install postgresql15 -y
+# Install PostgreSQL 17 client (if using external PostgreSQL)
+sudo yum install postgresql17 -y
 
-# Install PostgreSQL server (if hosting DB on same instance)
-sudo yum install postgresql15-server postgresql15-devel -y
+# Install PostgreSQL 17 server (if hosting DB on same instance)
+sudo yum install postgresql17-server postgresql17-devel -y
 
 # Install Nginx for reverse proxy
 sudo yum install nginx -y
