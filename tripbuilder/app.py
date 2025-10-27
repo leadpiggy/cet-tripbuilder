@@ -1032,16 +1032,6 @@ def enrollment_cancel():
         return redirect(url_for('trip_detail', trip_id=trip_id))
     return redirect(url_for('trip_list'))
 
-                'method': 'PUT',
-                'headers': {'Content-Type': file_type}
-            }
-        else:
-            return {'error': 'Failed to generate upload URL'}, 500
-            
-    except Exception as e:
-        return {'error': str(e)}, 500
-
-
 # =====================================================================
 # VENDOR ROUTES
 # =====================================================================

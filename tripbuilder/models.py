@@ -418,6 +418,7 @@ class File(db.Model):
     def get_download_url(self, expiration=3600):
         """Generate temporary download URL"""
         from services.file_manager import file_manager
+        return file_manager.generate_download_url(self.s3_key, expiration)
 
 
 class TripVendor(db.Model):
@@ -546,5 +547,3 @@ def vendor_before_delete(mapper, connection, target):
     except Exception as e:
         print(f"⚠️  Event listener: Failed to remove vendor from GHL: {e}")
         # Don't raise - we want the database operation to succeed even if GHL sync fails
-        return f'<DropdownCache {self.field_key}: {len(self.options)} options>'
-        return file_manager.generate_download_url(self.s3_key, expiration)
