@@ -734,6 +734,304 @@ def ghl_webhook():
         if upload_url:
             return {
                 'upload_url': upload_url,
+                'contact_id': contact_id,
+                'file_name': file_name,
+                'file_type': file_type
+            }
+        else:
+            return {'error': 'Could not generate upload URL'}, 500
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+# =====================================================================
+# ENROLLMENT WIZARD ROUTES
+# =====================================================================
+
+@app.route('/trips/<int:trip_id>/enroll/start')
+def enrollment_start(trip_id):
+    """Initialize enrollment wizard session"""
+    from flask import session
+    trip = Trip.query.get_or_404(trip_id)
+    
+    # Initialize wizard session
+    session['enrollment_wizard'] = {
+        'trip_id': trip_id,
+        'current_step': 1,
+        'step_1_complete': False,
+        'step_2_complete': False,
+        'step_3_complete': False,
+        'step_4_complete': False,
+        'step_5_complete': False,
+        'contact_id': None,
+        'data': {}
+    }
+    
+    return redirect(url_for('enrollment_step', trip_id=trip_id, step=1))
+
+
+@app.route('/trips/<int:trip_id>/enroll/step/<int:step>', methods=['GET', 'POST'])
+def enrollment_step(trip_id, step):
+    """Handle enrollment wizard steps"""
+    from flask import session
+    from forms import (Step2PassengerInfoForm, Step3PassportInfoForm, 
+                      Step4HealthInfoForm, Step5SignatureForm, populate_form_choices)
+    from constants import RESPONSIBILITY_STATEMENT
+    
+    trip = Trip.query.get_or_404(trip_id)
+    wizard = session.get('enrollment_wizard')
+    
+    # Redirect to start if no session
+    if not wizard or wizard['trip_id'] != trip_id:
+        return redirect(url_for('enrollment_start', trip_id=trip_id))
+    
+    # Handle POST - save step data
+    if request.method == 'POST':
+        # Validate step
+        form = None
+        if step == 2:
+            form = Step2PassengerInfoForm()
+            populate_form_choices(form)
+        elif step == 3:
+            form = Step3PassportInfoForm()
+            populate_form_choices(form)
+        elif step == 4:
+            form = Step4HealthInfoForm()
+        elif step == 5:
+            form = Step5SignatureForm()
+            populate_form_choices(form)
+        
+        if form and form.validate_on_submit():
+            # Save step data to session
+            wizard['data'][f'step_{step}'] = request.form.to_dict()
+            wizard[f'step_{step}_complete'] = True
+            
+            # For step 2, create or find contact
+            if step == 2:
+                from services.ghl_sync import GHLSyncService
+                ghl_sync = GHLSyncService(ghl_api)
+                
+                contact_data = {
+                    'firstname': request.form['first_name'],
+                    'lastname': request.form['last_name'],
+                    'email': request.form['user_email'],
+                    'phone': request.form.get('user_phone'),
+                    'address': request.form.get('mailing_address'),
+                    'city': request.form.get('user_city'),
+                    'state': request.form.get('user_state'),
+                    'postal_code': request.form.get('user_zip')
+                }
+                
+                try:
+                    contact = ghl_sync.get_or_create_contact(contact_data)
+                    wizard['contact_id'] = contact.id
+                except Exception as e:
+                    flash(f'Error with contact: {e}', 'error')
+                    return redirect(url_for('enrollment_step', trip_id=trip_id, step=step))
+            
+            session['enrollment_wizard'] = wizard
+            
+            # Redirect to next step or completion
+            if step < 5:
+                return redirect(url_for('enrollment_step', trip_id=trip_id, step=step+1))
+            else:
+                return redirect(url_for('enrollment_complete', trip_id=trip_id))
+        else:
+            # Form validation failed
+            flash('Please correct the errors below', 'error')
+    
+    # GET request or validation failed - show form
+    wizard['current_step'] = step
+    session['enrollment_wizard'] = wizard
+    
+    # Create form instance with saved data
+    form = None
+    saved_data = wizard['data'].get(f'step_{step}', {})
+    
+    if step == 2:
+        form = Step2PassengerInfoForm(data=saved_data)
+        populate_form_choices(form)
+    elif step == 3:
+        form = Step3PassportInfoForm(data=saved_data)
+        populate_form_choices(form)
+    elif step == 4:
+        form = Step4HealthInfoForm(data=saved_data)
+    elif step == 5:
+        form = Step5SignatureForm(data=saved_data)
+        populate_form_choices(form)
+    
+    # Template names
+    template_map = {
+        1: 'enrollment/step_1_trip_info.html',
+        2: 'enrollment/step_2_passenger.html',
+        3: 'enrollment/step_3_passport.html',
+        4: 'enrollment/step_4_health.html',
+        5: 'enrollment/step_5_signature.html'
+    }
+    
+    return render_template(
+        template_map.get(step, 'enrollment/step_1_trip_info.html'),
+        trip=trip,
+        wizard=wizard,
+        current_step=step,
+        form=form,
+        responsibility_statement=RESPONSIBILITY_STATEMENT,
+        current_date=datetime.utcnow()
+    )
+
+
+@app.route('/trips/<int:trip_id>/enroll/complete', methods=['POST'])
+def enrollment_complete(trip_id):
+    """Complete enrollment - create passenger record with all data"""
+    from flask import session
+    from services.pdf_generator import pdf_generator
+    import base64
+    import io
+    
+    trip = Trip.query.get_or_404(trip_id)
+    wizard = session.get('enrollment_wizard')
+    
+    if not wizard or wizard['trip_id'] != trip_id:
+        flash('Enrollment session expired. Please start again.', 'error')
+        return redirect(url_for('enrollment_start', trip_id=trip_id))
+    
+    try:
+        # Combine all step data
+        all_data = {}
+        for step_key, step_data in wizard['data'].items():
+            all_data.update(step_data)
+        
+        # Add final form data
+        all_data.update(request.form.to_dict())
+        
+        # Create passenger
+        passenger = Passenger(
+            contact_id=wizard['contact_id'],
+            trip_id=trip_id,
+            trip_name=trip.name,
+            
+            # From Step 2
+            firstname=all_data.get('first_name'),
+            lastname=all_data.get('last_name'),
+            email=all_data.get('user_email'),
+            phone=all_data.get('user_phone') or all_data.get('mob_number'),
+            
+            # From Step 3
+            passport_number=all_data.get('passport_number'),
+            date_of_birth=datetime.strptime(all_data['user_dob'], '%Y-%m-%d').date() if all_data.get('user_dob') else None,
+            gender=all_data.get('gender'),
+            passport_expire=datetime.strptime(all_data['passport_expire'], '%Y-%m-%d').date() if all_data.get('passport_expire') else None,
+            passport_country=all_data.get('passport_country'),
+            
+            # From Step 4
+            health_state=all_data.get('health_state'),
+            health_medical_info=all_data.get('health_medical_info'),
+            primary_phy=all_data.get('primary_phy'),
+            physician_phone=all_data.get('physician_phone'),
+            medication_list=all_data.get('medication_list'),
+            
+            # Room preferences
+            room_occupancy=all_data.get('choose_occupancy'),
+            user_roomate=all_data.get('user_roomate'),
+            
+            # From Step 5
+            contact1_ufirst_name=all_data.get('contact1_ufirst_name'),
+            contact1_ulast_name=all_data.get('contact1_ulast_name'),
+            contact1_urelationship=all_data.get('contact1_urelationship'),
+            contact1_umailing_address=all_data.get('contact1_umailing_address'),
+            contact1_ucity=all_data.get('contact1_ucity'),
+            contact1_ustate=all_data.get('contact1_ustate'),
+            contact1_uzip=all_data.get('contact1_uzip'),
+            contact1_uemail=all_data.get('contact1_uemail'),
+            contact1_uphone=all_data.get('contact1_uphone'),
+            contact1_umob_number=all_data.get('contact1_umob_number'),
+            
+            # Travel category
+            travel_category_license=all_data.get('travel_category_license'),
+            
+            # Form submission
+            form_submitted_date=datetime.utcnow().date(),
+            registration_completed=True
+        )
+        
+        # Copy travel category from trip
+        if trip.travel_category:
+            passenger.travel_category_license = trip.travel_category
+        
+        db.session.add(passenger)
+        db.session.flush()  # Get passenger.id
+        
+        # Handle signature
+        signature_data = all_data.get('signature_data')
+        if signature_data:
+            # Decode base64 signature
+            signature_bytes = base64.b64decode(signature_data.split(',')[1])
+            
+            # Upload to S3
+            passenger_name = f"{passenger.firstname}_{passenger.lastname}"
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            s3_path = file_manager.build_s3_path(
+                trip.name,
+                passenger_name,
+                'signatures',
+                f'signature_{timestamp}.png'
+            )
+            
+            file_manager.upload_file(
+                io.BytesIO(signature_bytes),
+                s3_path,
+                content_type='image/png',
+                make_public=False
+            )
+            
+            passenger.passenger_signature = s3_path
+        
+        # Generate PDFs
+        try:
+            pdfs = pdf_generator.generate_all_pdfs(passenger, trip, passenger.passenger_signature)
+            passenger.mou = pdfs.get('mou')
+            passenger.affidavit = pdfs.get('affidavit')
+            passenger.reservation = pdfs.get('reservation')
+        except Exception as pdf_error:
+            print(f"Warning: PDF generation failed: {pdf_error}")
+            flash('Enrollment successful, but PDF generation failed. PDFs will be generated later.', 'warning')
+        
+        # Sync to GHL
+        try:
+            sync_service.auto_sync_on_passenger_create(passenger)
+            flash(f'Enrollment complete for {passenger.firstname} {passenger.lastname}! Synced to GHL.', 'success')
+        except Exception as sync_error:
+            print(f"Warning: GHL sync failed: {sync_error}")
+            flash(f'Enrollment complete locally, but GHL sync failed: {sync_error}', 'warning')
+        
+        db.session.commit()
+        
+        # Clear wizard session
+        session.pop('enrollment_wizard', None)
+        
+        return redirect(url_for('passenger_detail', passenger_id=passenger.id))
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Enrollment failed: {e}', 'error')
+        print(f"Enrollment error: {e}")
+        import traceback
+        traceback.print_exc()
+        return redirect(url_for('enrollment_step', trip_id=trip_id, step=5))
+
+
+@app.route('/enrollment/cancel')
+def enrollment_cancel():
+    """Cancel enrollment and clear session"""
+    from flask import session
+    trip_id = session.get('enrollment_wizard', {}).get('trip_id')
+    session.pop('enrollment_wizard', None)
+    
+    flash('Enrollment cancelled', 'info')
+    
+    if trip_id:
+        return redirect(url_for('trip_detail', trip_id=trip_id))
+    return redirect(url_for('trip_list'))
+
                 'method': 'PUT',
                 'headers': {'Content-Type': file_type}
             }

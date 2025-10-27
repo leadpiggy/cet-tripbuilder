@@ -1,0 +1,60 @@
+{% extends "enrollment/base_wizard.html" %}
+
+{% block step_content %}
+<div class="form-section">
+    <h3 class="mb-4">
+        <i class="bi bi-heart-pulse"></i> Health Information
+    </h3>
+
+    <form method="POST">
+        <div class="mb-4">
+            <label for="health_state" class="form-label">How is your general state of health?</label>
+            <textarea class="form-control" id="health_state" name="health_state" rows="4"
+                      placeholder="Please describe your general health condition...">{{ form.health_state.data or '' }}</textarea>
+        </div>
+
+        <div class="mb-4">
+            <label for="health_medical_info" class="form-label">Special Medical, Physical, Dietary Limitations, or Allergies?</label>
+            <textarea class="form-control" id="health_medical_info" name="health_medical_info" rows="4"
+                      placeholder="Please list any medical conditions, allergies, dietary restrictions, mobility limitations, etc...">{{ form.health_medical_info.data or '' }}</textarea>
+            <small class="form-text text-muted">
+                This information helps us provide appropriate accommodations and assistance during your trip.
+            </small>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="primary_phy" class="form-label">Primary Physician</label>
+                <input type="text" class="form-control" id="primary_phy" name="primary_phy" 
+                       value="{{ form.primary_phy.data or '' }}"
+                       placeholder="Dr. Smith">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="physician_phone" class="form-label">Physician Phone Number</label>
+                <input type="tel" class="form-control" id="physician_phone" name="physician_phone" 
+                       value="{{ form.physician_phone.data or '' }}"
+                       placeholder="(555) 123-4567">
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label for="medication_list" class="form-label">List of Prescription Medications (Recommended)</label>
+            <textarea class="form-control" id="medication_list" name="medication_list" rows="4"
+                      placeholder="List all prescription medications you take regularly...">{{ form.medication_list.data or '' }}</textarea>
+            <small class="form-text text-muted">
+                This information is for emergency purposes and remains confidential.
+            </small>
+        </div>
+
+        <!-- Navigation -->
+        <div class="wizard-nav">
+            <a href="{{ url_for('enrollment_step', trip_id=trip.id, step=3) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+            <button type="submit" class="btn btn-primary">
+                Next: Emergency Contact <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

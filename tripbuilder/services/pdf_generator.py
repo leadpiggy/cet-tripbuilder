@@ -2,7 +2,7 @@
 PDF Generator Service
 
 Generates three types of PDFs for each passenger:
-1. MOU (Memo of Understanding) - with signature
+1. MOU (Memo of Understanding) - with signature and responsibility statement
 2. Affidavit - with signature and travel category license
 3. Reservation - with passenger and trip details
 
@@ -19,6 +19,7 @@ from datetime import datetime
 import io
 import os
 from services.file_manager import file_manager
+from constants import RESPONSIBILITY_STATEMENT
 
 
 class PDFGenerator:
@@ -108,32 +109,15 @@ class PDFGenerator:
             story.append(Paragraph(passenger_info, self.styles['CustomBody']))
             story.append(Spacer(1, 0.3*inch))
             
-            # MOU Terms
-            terms = """
-            <b>Terms and Conditions:</b><br/><br/>
+            # Responsibility Statement (from constants.py)
+            story.append(Paragraph("<b>Responsibility Statement</b>", self.styles['Heading2']))
+            story.append(Spacer(1, 0.1*inch))
             
-            This Memorandum of Understanding (MOU) establishes the terms between the traveler and the trip organizer 
-            for participation in the above-referenced trip.<br/><br/>
-            
-            <b>1. Payment Terms:</b> The traveler agrees to pay all applicable fees according to the payment schedule 
-            provided. A deposit is required to secure the reservation.<br/><br/>
-            
-            <b>2. Cancellation Policy:</b> Cancellations must be made in writing. Refund eligibility depends on the 
-            timing of cancellation relative to the trip departure date.<br/><br/>
-            
-            <b>3. Travel Insurance:</b> The traveler is strongly encouraged to purchase travel insurance to protect 
-            against unforeseen circumstances.<br/><br/>
-            
-            <b>4. Health and Safety:</b> The traveler certifies that they are physically and mentally capable of 
-            participating in the trip activities. Any medical conditions must be disclosed.<br/><br/>
-            
-            <b>5. Liability:</b> The traveler acknowledges and accepts the inherent risks of travel and agrees to 
-            hold harmless the trip organizer from any claims arising from participation.<br/><br/>
-            
-            <b>6. Travel Documents:</b> The traveler is responsible for obtaining and maintaining valid travel 
-            documents, including passport and any required visas.<br/><br/>
-            """
-            story.append(Paragraph(terms, self.styles['CustomBody']))
+            # Split the responsibility statement into paragraphs for better formatting
+            responsibility_paragraphs = RESPONSIBILITY_STATEMENT.split('\n\n')
+            for para_text in responsibility_paragraphs:
+                if para_text.strip():
+                    story.append(Paragraph(para_text.strip(), self.styles['CustomBody']))
             story.append(Spacer(1, 0.3*inch))
             
             # Acknowledgment

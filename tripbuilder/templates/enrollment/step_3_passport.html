@@ -1,0 +1,74 @@
+{% extends "enrollment/base_wizard.html" %}
+
+{% block step_content %}
+<div class="form-section">
+    <h3 class="mb-4">
+        <i class="bi bi-card-text"></i> Passport Information
+    </h3>
+
+    <form method="POST" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="passport_number" class="form-label">Passport Number <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="passport_number" name="passport_number" 
+                       value="{{ form.passport_number.data or '' }}" required>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label for="user_dob" class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" id="user_dob" name="user_dob" 
+                       value="{{ form.user_dob.data or '' }}" required>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label class="form-label">Gender <span class="text-danger">*</span></label>
+                <div class="mt-2">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="gender" id="gender_male" 
+                               value="male" {{ 'checked' if form.gender.data == 'male' else '' }} required>
+                        <label class="form-check-label" for="gender_male">Male</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="gender" id="gender_female" 
+                               value="female" {{ 'checked' if form.gender.data == 'female' else '' }} required>
+                        <label class="form-check-label" for="gender_female">Female</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="passport_expire" class="form-label">Passport Expiration <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" id="passport_expire" name="passport_expire" 
+                       value="{{ form.passport_expire.data or '' }}" required>
+                <small class="form-text text-muted">Must be valid for 6+ months from travel date</small>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="passport_country" class="form-label">Passport Country <span class="text-danger">*</span></label>
+                {{ form.passport_country(class="form-select") }}
+            </div>
+        </div>
+
+        <!-- Passport Photo Upload -->
+        <div class="row">
+            <div class="col-md-12 mb-3">
+                <label for="passport_file" class="form-label">Upload Passport Photo</label>
+                <input type="file" class="form-control" id="passport_file" name="passport_file" 
+                       accept="image/jpeg,image/png,image/gif">
+                <small class="form-text text-muted">
+                    Please upload an image of your passport. Supported formats: JPG, PNG, GIF
+                </small>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="wizard-nav">
+            <a href="{{ url_for('enrollment_step', trip_id=trip.id, step=2) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+            <button type="submit" class="btn btn-primary">
+                Next: Health Info <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

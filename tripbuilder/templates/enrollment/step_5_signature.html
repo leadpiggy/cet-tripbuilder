@@ -1,0 +1,327 @@
+{% extends "enrollment/base_wizard.html" %}
+
+{% block step_content %}
+<div class="form-section">
+    <h3 class="mb-4">
+        <i class="bi bi-shield-exclamation"></i> Emergency Contact & Agreement
+    </h3>
+
+    <form method="POST" id="signatureForm">
+        <!-- Emergency Contact 1 (Required) -->
+        <h5 class="mb-3">Emergency Contact 1 <span class="text-danger">*</span></h5>
+        <p class="text-muted mb-3">
+            List one individual not traveling with you who you are confident will assume responsibility for you in case of an emergency.
+        </p>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label for="contact1_ulast_name" class="form-label">Last Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="contact1_ulast_name" name="contact1_ulast_name" 
+                       value="{{ form.contact1_ulast_name.data or '' }}" required>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="contact1_ufirst_name" class="form-label">First Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="contact1_ufirst_name" name="contact1_ufirst_name" 
+                       value="{{ form.contact1_ufirst_name.data or '' }}" required>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="contact1_urelationship" class="form-label">Relationship <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="contact1_urelationship" name="contact1_urelationship" 
+                       value="{{ form.contact1_urelationship.data or '' }}" 
+                       placeholder="e.g., Spouse, Parent, Sibling" required>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-5 mb-3">
+                <label for="contact1_umailing_address" class="form-label">Mailing Address <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="contact1_umailing_address" name="contact1_umailing_address" 
+                       value="{{ form.contact1_umailing_address.data or '' }}" required>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label for="contact1_ucity" class="form-label">City <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="contact1_ucity" name="contact1_ucity" 
+                       value="{{ form.contact1_ucity.data or '' }}" required>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label for="contact1_ustate" class="form-label">State <span class="text-danger">*</span></label>
+                {{ form.contact1_ustate(class="form-select") }}
+            </div>
+            <div class="col-md-2 mb-3">
+                <label for="contact1_uzip" class="form-label">Zip <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="contact1_uzip" name="contact1_uzip" 
+                       value="{{ form.contact1_uzip.data or '' }}" required>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-5 mb-3">
+                <label for="contact1_uemail" class="form-label">Email <span class="text-danger">*</span></label>
+                <input type="email" class="form-control" id="contact1_uemail" name="contact1_uemail" 
+                       value="{{ form.contact1_uemail.data or '' }}" required>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label for="contact1_uphone" class="form-label">Phone</label>
+                <input type="tel" class="form-control" id="contact1_uphone" name="contact1_uphone" 
+                       value="{{ form.contact1_uphone.data or '' }}">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="contact1_umob_number" class="form-label">Mobile</label>
+                <input type="tel" class="form-control" id="contact1_umob_number" name="contact1_umob_number" 
+                       value="{{ form.contact1_umob_number.data or '' }}">
+                <small class="form-text text-muted">Enter phone or mobile</small>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- Emergency Contact 2 (Optional) -->
+        <h5 class="mb-3">Emergency Contact 2 <span class="text-muted">(Optional)</span></h5>
+        
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label for="contact2_ulast_name" class="form-label">Last Name</label>
+                <input type="text" class="form-control" id="contact2_ulast_name" name="contact2_ulast_name" 
+                       value="{{ form.contact2_ulast_name.data or '' }}">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="contact2_ufirst_name" class="form-label">First Name</label>
+                <input type="text" class="form-control" id="contact2_ufirst_name" name="contact2_ufirst_name" 
+                       value="{{ form.contact2_ufirst_name.data or '' }}">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="contact2_urelationship" class="form-label">Relationship</label>
+                <input type="text" class="form-control" id="contact2_urelationship" name="contact2_urelationship" 
+                       value="{{ form.contact2_urelationship.data or '' }}"
+                       placeholder="e.g., Friend, Colleague">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-5 mb-3">
+                <label for="contact2_umailing_address" class="form-label">Mailing Address</label>
+                <input type="text" class="form-control" id="contact2_umailing_address" name="contact2_umailing_address" 
+                       value="{{ form.contact2_umailing_address.data or '' }}">
+            </div>
+            <div class="col-md-3 mb-3">
+                <label for="contact2_ucity" class="form-label">City</label>
+                <input type="text" class="form-control" id="contact2_ucity" name="contact2_ucity" 
+                       value="{{ form.contact2_ucity.data or '' }}">
+            </div>
+            <div class="col-md-2 mb-3">
+                <label for="contact2_ustate" class="form-label">State</label>
+                {{ form.contact2_ustate(class="form-select") }}
+            </div>
+            <div class="col-md-2 mb-3">
+                <label for="contact2_uzip" class="form-label">Zip</label>
+                <input type="text" class="form-control" id="contact2_uzip" name="contact2_uzip" 
+                       value="{{ form.contact2_uzip.data or '' }}">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-5 mb-3">
+                <label for="contact2_uemail" class="form-label">Email</label>
+                <input type="email" class="form-control" id="contact2_uemail" name="contact2_uemail" 
+                       value="{{ form.contact2_uemail.data or '' }}">
+            </div>
+            <div class="col-md-3 mb-3">
+                <label for="contact2_uphone" class="form-label">Phone</label>
+                <input type="tel" class="form-control" id="contact2_uphone" name="contact2_uphone" 
+                       value="{{ form.contact2_uphone.data or '' }}">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="contact2_umob_number" class="form-label">Mobile</label>
+                <input type="tel" class="form-control" id="contact2_umob_number" name="contact2_umob_number" 
+                       value="{{ form.contact2_umob_number.data or '' }}">
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- Responsibility Statement -->
+        <h5 class="mb-3">Responsibility Statement</h5>
+        <div class="responsibility-statement border rounded p-3 mb-4" style="max-height: 300px; overflow-y: auto; background-color: #f8f9fa;">
+            {{ responsibility_statement|safe }}
+        </div>
+
+        <!-- Travel Category License -->
+        <div class="mb-4">
+            <label for="travel_category_license" class="form-label">
+                Select Travel Category License <span class="text-danger">*</span>
+            </label>
+            {{ form.travel_category_license(class="form-select") }}
+            <small class="form-text text-muted">
+                This is your OFAC (Office of Foreign Assets Control) travel authorization category.
+                If unsure, consult your trip organizer.
+            </small>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- Digital Signature -->
+        <h5 class="mb-3">Digital Signature <span class="text-danger">*</span></h5>
+        <p class="text-muted">Please sign below using your mouse or touchscreen</p>
+        
+        <div class="signature-pad-container mb-3">
+            <canvas id="signatureCanvas" class="signature-canvas"></canvas>
+            <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="clearSignature">
+                <i class="bi bi-arrow-counterclockwise"></i> Clear Signature
+            </button>
+        </div>
+        <input type="hidden" id="signature_data" name="signature_data" required>
+
+        <!-- Agreement Checkbox -->
+        <div class="form-check mb-4">
+            <input type="checkbox" class="form-check-input" id="agree" name="agree" required>
+            <label class="form-check-label" for="agree">
+                By checking here, I agree to the Responsibility Statement above. <span class="text-danger">*</span>
+            </label>
+        </div>
+
+        <!-- Current Date Display -->
+        <div class="mb-4">
+            <label class="form-label">Date</label>
+            <input type="text" class="form-control" readonly 
+                   value="{{ current_date.strftime('%B %d, %Y') if current_date else now.strftime('%B %d, %Y') }}">
+        </div>
+
+        <!-- Navigation -->
+        <div class="wizard-nav">
+            <a href="{{ url_for('enrollment_step', trip_id=trip.id, step=4) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+            <button type="submit" class="btn btn-success btn-lg" id="submitEnrollment">
+                <i class="bi bi-check-circle"></i> Complete Enrollment
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+// Signature Canvas Implementation
+(function() {
+    const canvas = document.getElementById('signatureCanvas');
+    const ctx = canvas.getContext('2d');
+    const signatureInput = document.getElementById('signature_data');
+    const clearButton = document.getElementById('clearSignature');
+    const submitButton = document.getElementById('submitEnrollment');
+    
+    // Set canvas size
+    canvas.width = canvas.offsetWidth;
+    canvas.height = 200;
+    
+    // Initialize drawing state
+    let isDrawing = false;
+    let hasSignature = false;
+    
+    // Set canvas background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Drawing settings
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    
+    // Mouse events
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+    
+    // Touch events for mobile
+    canvas.addEventListener('touchstart', handleTouch);
+    canvas.addEventListener('touchmove', handleTouch);
+    canvas.addEventListener('touchend', stopDrawing);
+    
+    function startDrawing(e) {
+        isDrawing = true;
+        const rect = canvas.getBoundingClientRect();
+        ctx.beginPath();
+        ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    }
+    
+    function draw(e) {
+        if (!isDrawing) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+        ctx.stroke();
+        hasSignature = true;
+    }
+    
+    function stopDrawing() {
+        if (isDrawing) {
+            isDrawing = false;
+            // Save signature data
+            signatureInput.value = canvas.toDataURL('image/png');
+        }
+    }
+    
+    function handleTouch(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : e.type === 'touchmove' ? 'mousemove' : 'mouseup', {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        canvas.dispatchEvent(mouseEvent);
+    }
+    
+    // Clear signature
+    clearButton.addEventListener('click', function() {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        signatureInput.value = '';
+        hasSignature = false;
+    });
+    
+    // Form validation
+    document.getElementById('signatureForm').addEventListener('submit', function(e) {
+        if (!hasSignature || !signatureInput.value) {
+            e.preventDefault();
+            alert('Please provide your signature before submitting.');
+            return false;
+        }
+        
+        if (!document.getElementById('agree').checked) {
+            e.preventDefault();
+            alert('You must agree to the Responsibility Statement to continue.');
+            return false;
+        }
+        
+        // Show loading state
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+    });
+})();
+</script>
+
+<style>
+.signature-canvas {
+    border: 2px solid #0d6efd;
+    border-radius: 4px;
+    cursor: crosshair;
+    width: 100%;
+    background-color: white;
+    touch-action: none;
+}
+
+.signature-pad-container {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.responsibility-statement {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.responsibility-statement p {
+    margin-bottom: 15px;
+}
+</style>
+{% endblock %}
